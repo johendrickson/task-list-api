@@ -1,10 +1,33 @@
+import os
+import requests
 from datetime import datetime, timezone
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.task import Task
 from .route_utilities import validate_model
 from ..db import db
 
+
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+
+def send_slack_message(task_title):
+    slack_token = os.environ.get('SLACK_BOT_TOKEN')
+    slack_channel = 'test-slack-api'  # Channel name in Slack
+    slack_message = f"Jamie just completed the task {task_title}"
+
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        "Authorization": f"Bearer {slack_token}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "channel": slack_channel,
+        "text": slack_message,
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    
+    if not response.ok:
+        print(f"Error sending message to Slack: {response.text}")
 
 @bp.post("")
 def create_task():
@@ -82,6 +105,9 @@ def mark_complete(task_id):
         return task
     task.completed_at = datetime.now(timezone.utc)
     db.session.commit()
+
+    send_slack_message(task.title)
+    
     return make_response("", 204)
 
 @bp.patch("/<task_id>/mark_incomplete")
