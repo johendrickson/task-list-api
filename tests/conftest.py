@@ -47,6 +47,7 @@ def one_task(app):
                     completed_at=None)
     db.session.add(new_task)
     db.session.commit()
+    return new_task
 
 
 # This fixture gets called in every test that
@@ -80,7 +81,7 @@ def completed_task(app):
                     completed_at=datetime.now())
     db.session.add(new_task)
     db.session.commit()
-
+    return new_task
 
 # This fixture gets called in every test that
 # references "one_goal"
