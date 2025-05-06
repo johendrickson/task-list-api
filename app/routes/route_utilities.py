@@ -16,3 +16,9 @@ def validate_model(cls, model_id):
         abort(make_response(response, 404))
     
     return model
+
+def get_model_by_id(cls, model_id):
+    model = cls.query.get(model_id)
+    if model is None:
+        abort(404, description=f"{cls.__name__} with id {model_id} not found")
+    return model
