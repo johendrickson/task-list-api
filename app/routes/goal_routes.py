@@ -2,6 +2,7 @@ import os
 import requests
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.goal import Goal
+from app.models.task import Task
 from .route_utilities import validate_model, get_model_by_id
 from ..db import db
 
@@ -69,9 +70,13 @@ def assign_tasks_to_goal(goal_id):
         task = get_model_by_id(Task, task_id)
         tasks.append(task)
     
+    # Unassign existing tasks from the goal
+    for task in goal.tasks:
+        task.goal_id = None
+    
+    # Assign new tasks to the goal
     for task in tasks:
         task.goal_id = goal.id
-    
     db.session.commit()
     
     return {
@@ -86,6 +91,6 @@ def get_tasks_for_goal(goal_id):
     tasks = goal.tasks
     
     goal_data = goal.to_dict()
-    goal_data["tasks"] = [task.to_dict() for task in tasks]
+    goal_data["tasks"] = [task.to_dict(include_goal_id=True) for task in tasks]
     
     return goal_data, 200

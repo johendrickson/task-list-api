@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, make_response
 from .db import db, migrate
 from .models import task, goal
 import os
@@ -24,4 +24,8 @@ def create_app(config=None):
     app.register_blueprint(tasks_bp)
     app.register_blueprint(goals_bp)
 
+    @app.errorhandler(404)
+    def handle_404(error):
+        return make_response({"message": error.description}, 404)
+    
     return app

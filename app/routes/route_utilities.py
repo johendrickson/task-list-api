@@ -1,5 +1,6 @@
 from flask import abort, make_response
 from ..db import db
+from sqlalchemy.orm import Session
 
 def validate_model(cls, model_id):
     try:
@@ -18,7 +19,7 @@ def validate_model(cls, model_id):
     return model
 
 def get_model_by_id(cls, model_id):
-    model = cls.query.get(model_id)
+    model = db.session.get(cls, model_id)
     if model is None:
-        abort(404, description=f"{cls.__name__} with id {model_id} not found")
+        abort(404, description=f"{cls.__name__} not found")
     return model
