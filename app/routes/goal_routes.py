@@ -2,7 +2,6 @@ import os
 import requests
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.goal import Goal
-from app.models.task import Task
 from .route_utilities import validate_model, get_model_by_id
 from ..db import db
 
@@ -57,6 +56,8 @@ def get_one_goal(goal_id):
 
 @bp.post("/<goal_id>/tasks")
 def assign_tasks_to_goal(goal_id):
+    from app.models.task import Task
+    
     goal = get_model_by_id(Goal, goal_id)
     
     request_data = request.get_json()
