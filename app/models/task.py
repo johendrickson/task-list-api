@@ -8,8 +8,8 @@ class Task(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()
-    completed_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
-    goal_id: Mapped[Optional[int]] = mapped_column(db.ForeignKey("goal.id"), nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column()
+    goal_id: Mapped[Optional[int]] = mapped_column(db.ForeignKey("goal.id"))
     goal: Mapped[Optional["Goal"]] = relationship(back_populates="tasks")
 
     def to_dict(self, include_goal_id=False):
