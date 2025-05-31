@@ -37,14 +37,18 @@ def test_mark_complete_on_incomplete_task(client, one_task):
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_complete_task(client, completed_task):
+    task_id = completed_task.id
+
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
 
 
     # Assert
     assert response.status_code == 204
-    query = db.select(Task).where(Task.id == one_task.id)
-    assert db.session.scalar(query).completed_at is None
+
+    query = db.select(Task).where(Task.id == task_id)
+    task_in_db = db.session.scalar(query)
+    assert task_in_db.completed_at is None
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -76,14 +80,17 @@ def test_mark_complete_on_completed_task(client, completed_task):
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_incomplete_task(client, one_task):
+    task_id = one_task.id
+
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
 
     # Assert
     assert response.status_code == 204
 
-    query = db.select(Task).where(Task.id == one_task.id)
-    assert db.session.scalar(query).completed_at == None
+    query = db.select(Task).where(Task.id == task_id)
+    task_in_db = db.session.scalar(query)
+    assert task_in_db.completed_at is None
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")

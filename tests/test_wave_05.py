@@ -42,7 +42,8 @@ def test_get_goal(client, one_goal):
     assert response_body == {
         "goal": {
             "id": 1,
-            "title": "Build a habit of going outside daily"
+            "title": "Build a habit of going outside daily",
+            "tasks": []
         }
     }
 
@@ -118,7 +119,7 @@ def test_delete_goal(client, one_goal):
     response_body = response.get_json()
     assert "message" in response_body
     assert response_body == {"message": "Goal not found"}
-    
+
     query = db.select(Goal).where(Goal.id == 1)
     assert db.session.scalar(query) == None
 

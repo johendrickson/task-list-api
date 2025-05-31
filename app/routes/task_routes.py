@@ -103,11 +103,11 @@ def mark_complete(task_id):
 
     notify_task_completion(task)
 
-    return make_response("", 204)
+    return Response(status=204, mimetype="application/json")
 
 @bp.patch("/<task_id>/mark_incomplete")
 def mark_incomplete(task_id):
     task = validate_model(Task, task_id)
     task.completed_at = None
     db.session.commit()
-    return make_response("", 204)
+    return Response(status=204, mimetype="application/json")
