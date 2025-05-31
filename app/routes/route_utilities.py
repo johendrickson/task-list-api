@@ -1,6 +1,7 @@
+import os
+import requests
 from flask import abort, make_response
-from ..db import db
-from sqlalchemy.orm import Session
+from app.db import db
 
 def validate_model(cls, model_id):
     try:
@@ -30,7 +31,8 @@ def send_slack_message_to_channel(message: str, channel: str):
         print("Slack token not found in environment variables.")
         return
 
-    url = "https://slack.com/api/chat.postMessage"
+    url = os.environ.get("SLACK_API_URL", "https://slack.com/api/chat.postMessage")
+
     headers = {
         "Authorization": f"Bearer {slack_token}",
         "Content-Type": "application/json",
