@@ -1,5 +1,3 @@
-import os
-import requests
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.goal import Goal
 from .route_utilities import validate_model, get_model_by_id
@@ -52,7 +50,7 @@ def delete_goal(goal_id):
 @bp.get("/<goal_id>")
 def get_one_goal(goal_id):
     goal = get_model_by_id(Goal, goal_id)
-    return {"goal": goal.to_dict()}
+    return {"goal": goal.to_dict_with_tasks()}
 
 @bp.post("/<goal_id>/tasks")
 def assign_tasks_to_goal(goal_id):
@@ -68,13 +66,7 @@ def assign_tasks_to_goal(goal_id):
 
     tasks = [get_model_by_id(Task, task_id) for task_id in task_ids]
 
-    # Unassign existing tasks from the goal
-    for task in goal.tasks:
-        task.goal_id = None
-
-    # Assign new tasks to the goal
-    for task in tasks:
-        task.goal_id = goal.id
+    goal.tasks = tasks
     db.session.commit()
 
     return {
@@ -85,10 +77,4 @@ def assign_tasks_to_goal(goal_id):
 @bp.get("/<goal_id>/tasks")
 def get_tasks_for_goal(goal_id):
     goal = get_model_by_id(Goal, goal_id)
-
-    tasks = goal.tasks
-
-    goal_data = goal.to_dict()
-    goal_data["tasks"] = [task.to_dict(include_goal_id=True) for task in tasks]
-
-    return goal_data, 200
+    return goal.to_dict_with_tasks(), 200
