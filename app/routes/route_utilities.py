@@ -23,3 +23,28 @@ def get_model_by_id(cls, model_id):
     if model is None:
         abort(404, description=f"{cls.__name__} not found")
     return model
+
+def send_slack_message_to_channel(message: str, channel: str):
+    slack_token = os.environ.get('SLACK_BOT_TOKEN')
+    if not slack_token:
+        print("Slack token not found in environment variables.")
+        return
+
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        "Authorization": f"Bearer {slack_token}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "channel": channel,
+        "text": message,
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    if not response.ok:
+        print(f"Error sending message to Slack: {response.text}")
+
+def notify_task_completion(task):
+    message = task.slack_completion_message()
+    channel = "test-slack-api"
+    send_slack_message_to_channel(message, channel)

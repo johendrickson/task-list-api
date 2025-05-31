@@ -15,6 +15,9 @@ class Task(db.Model):
     def is_complete(self):
         return self.completed_at is not None
 
+    def slack_completion_message(self):
+        return f"Jamie just completed the task: {self.title}"
+
     def to_dict(self):
         task_as_dict = {
             "id": self.id,

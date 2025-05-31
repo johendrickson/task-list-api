@@ -1,11 +1,10 @@
 import os
 import requests
-from datetime import datetime, timezone
 from flask import Blueprint, abort, make_response, request, Response
+from datetime import datetime, timezone
 from app.models.task import Task
-from .route_utilities import validate_model
-from ..db import db
-
+from app.routes.route_utilities import validate_model, notify_task_completion
+from app.db import db
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -25,7 +24,6 @@ def send_slack_message(task_title):
     }
 
     response = requests.post(url, headers=headers, json=data)
-    
     if not response.ok:
         print(f"Error sending message to Slack: {response.text}")
 
@@ -35,14 +33,14 @@ def create_task():
 
     try:
         new_task = Task.from_dict(request_body)
-        
-    except KeyError as error:
+
+    except KeyError:
         response = {"details": "Invalid data"}
         abort (make_response(response, 400))
-        
+
     db.session.add(new_task)
     db.session.commit()
-    
+
     return {"task": new_task.to_dict()}, 201
 
 @bp.get("")
@@ -101,13 +99,11 @@ def delete_task(task_id):
 @bp.patch("/<task_id>/mark_complete")
 def mark_complete(task_id):
     task = validate_model(Task, task_id)
-    if isinstance(task, dict):
-        return task
     task.completed_at = datetime.now(timezone.utc)
     db.session.commit()
 
-    send_slack_message(task.title)
-    
+    notify_task_completion(task)
+
     return make_response("", 204)
 
 @bp.patch("/<task_id>/mark_incomplete")
