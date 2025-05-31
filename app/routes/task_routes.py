@@ -65,9 +65,8 @@ def get_all_tasks():
 
     tasks = db.session.scalars(query)
 
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.to_dict())
+    tasks_response = [task.to_dict() for task in tasks]
+
     return tasks_response
 
 @bp.get("/<task_id>")
@@ -109,8 +108,6 @@ def mark_complete(task_id):
 @bp.patch("/<task_id>/mark_incomplete")
 def mark_incomplete(task_id):
     task = validate_model(Task, task_id)
-    if isinstance(task, dict):
-        return task
     task.completed_at = None
     db.session.commit()
     return make_response("", 204)
