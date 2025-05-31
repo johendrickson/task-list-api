@@ -50,7 +50,7 @@ def delete_goal(goal_id):
 @bp.get("/<goal_id>")
 def get_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-    return {"goal": goal.to_dict_with_tasks()}
+    return {"goal": goal.to_dict()}
 
 @bp.post("/<goal_id>/tasks")
 def assign_tasks_to_goal(goal_id):

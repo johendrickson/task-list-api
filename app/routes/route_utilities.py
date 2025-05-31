@@ -46,7 +46,11 @@ def send_slack_message_to_channel(message: str, channel: str):
     if not response.ok:
         print(f"Error sending message to Slack: {response.text}")
 
+def build_task_completion_message(task):
+    """Helper to build a Slack message when a task is completed."""
+    return f"Jamie just completed the task: {task.title}"
+
 def notify_task_completion(task):
-    message = task.slack_completion_message()
+    message = build_task_completion_message(task)
     channel = "test-slack-api"
     send_slack_message_to_channel(message, channel)
