@@ -49,14 +49,14 @@ def delete_goal(goal_id):
 
 @bp.get("/<goal_id>")
 def get_one_goal(goal_id):
-    goal = get_model_by_id(Goal, goal_id)
+    goal = validate_model(Goal, goal_id)
     return {"goal": goal.to_dict_with_tasks()}
 
 @bp.post("/<goal_id>/tasks")
 def assign_tasks_to_goal(goal_id):
     from app.models.task import Task
 
-    goal = get_model_by_id(Goal, goal_id)
+    goal = validate_model(Goal, goal_id)
 
     request_data = request.get_json()
     task_ids = request_data.get("task_ids")
@@ -76,5 +76,5 @@ def assign_tasks_to_goal(goal_id):
 
 @bp.get("/<goal_id>/tasks")
 def get_tasks_for_goal(goal_id):
-    goal = get_model_by_id(Goal, goal_id)
+    goal = validate_model(Goal, goal_id)
     return goal.to_dict_with_tasks(), 200

@@ -11,11 +11,11 @@ def validate_model(cls, model_id):
 
     query = db.select(cls).where(cls.id == model_id)
     model = db.session.scalar(query)
-    
+
     if not model:
         response = {"message": f"{cls.__name__} not found"}
         abort(make_response(response, 404))
-    
+
     return model
 
 def get_model_by_id(cls, model_id):
