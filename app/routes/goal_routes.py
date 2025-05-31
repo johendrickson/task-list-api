@@ -57,29 +57,26 @@ def get_one_goal(goal_id):
 @bp.post("/<goal_id>/tasks")
 def assign_tasks_to_goal(goal_id):
     from app.models.task import Task
-    
+
     goal = get_model_by_id(Goal, goal_id)
-    
+
     request_data = request.get_json()
     task_ids = request_data.get("task_ids")
-    
+
     if not task_ids or not isinstance(task_ids, list):
         return make_response({"details": "task_ids must be a list of integers."}, 400)
-    
-    tasks = []
-    for task_id in task_ids:
-        task = get_model_by_id(Task, task_id)
-        tasks.append(task)
-    
+
+    tasks = [get_model_by_id(Task, task_id) for task_id in task_ids]
+
     # Unassign existing tasks from the goal
     for task in goal.tasks:
         task.goal_id = None
-    
+
     # Assign new tasks to the goal
     for task in tasks:
         task.goal_id = goal.id
     db.session.commit()
-    
+
     return {
         "id": goal.id,
         "task_ids": [task.id for task in tasks]
@@ -88,10 +85,10 @@ def assign_tasks_to_goal(goal_id):
 @bp.get("/<goal_id>/tasks")
 def get_tasks_for_goal(goal_id):
     goal = get_model_by_id(Goal, goal_id)
-    
+
     tasks = goal.tasks
-    
+
     goal_data = goal.to_dict()
     goal_data["tasks"] = [task.to_dict(include_goal_id=True) for task in tasks]
-    
+
     return goal_data, 200
